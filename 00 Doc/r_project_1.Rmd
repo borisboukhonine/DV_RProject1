@@ -23,16 +23,30 @@ head(df_items)
 
 ```{r}
 ggplot(data=df_customers)+geom_histogram(aes(x=CUSTOMER_STATE, fill=CUSTOMER_STATE))
-
+ggplot(df_orders, aes(x=as.Date(ORDER_DATE, "%Y-%m-%d"), y=as.Date(SHIPPED_DATE, "%Y-%m-%d")))+geom_point()
 ggplot(data=df_order_details)+geom_histogram(aes(x=ITEM_ID))
 ggplot(df_items, aes(x=ARTIST, y=UNIT_PRICE, color=TITLE))+geom_point()
 
 ```
 
-You can also embed plots, for example:
 
-```{r, echo=FALSE}
-plot(cars)
+```{r}
+df_all <- data.frame(eval(parse(text=substring(getURL(URLencode('http://129.152.144.84:5001/rest/native/?query="select * from orders o join customers c on o.customer_id = c.customer_id join order_details d on o.order_id = d.order_id join items i on d.item_id = i.item_id"'), httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDB1.usuniversi01134.oraclecloud.internal', USER='DV_ORDERS', PASS='orcl', MODE='native_mode', MODEL='model', returnFor = 'R', returnDimensions = 'False'), verbose = TRUE), 1, 2^31-1))))
+
+head(df_all)
+
+p <- ggplot(df_all, aes(x=as.Date(ORDER_DATE, "%Y-%m-%d"), y=as.Date(SHIPPED_DATE, "%Y-%m-%d")))+geom_point(aes(color=as.factor(UNIT_PRICE)))
+
+p + facet_wrap(~CUSTOMER_STATE)
+
+p1 <- ggplot(df_all, aes(x=as.Date(ORDER_DATE, "%Y-%m-%d"), y=as.Date(SHIPPED_DATE, "%Y-%m-%d")))+geom_point(aes(color=as.factor(TITLE)))
+
+p1 + facet_wrap(~CUSTOMER_STATE)
+
+p2 <- ggplot(df_all, aes(x=as.Date(ORDER_DATE, "%Y-%m-%d"), y=as.Date(SHIPPED_DATE, "%Y-%m-%d")))+geom_point(aes(color=as.factor(ARTIST)))
+
+p2 + facet_wrap(~CUSTOMER_STATE)
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
